@@ -18,9 +18,11 @@ from sklearn.metrics import confusion_matrix
 
 np.random.seed(123)
 
+### Import the training data
 data = pd.read_csv('train.csv')
 re_data = data
 
+### Data cleaning: Drop the incomplete features
 data = data.drop(["Id","GarageYrBlt","Alley","PoolQC","Fence","MiscFeature","MasVnrType","MasVnrArea","FireplaceQu",
                   "BsmtQual","BsmtCond","BsmtFinType1","BsmtExposure","BsmtFinType2","GarageType", "GarageFinish",
                   "GarageQual","GarageCond","LotFrontage","Neighborhood"],axis=1)
@@ -67,6 +69,7 @@ cleanup_nums2 = {"Exterior1st": {"VinylSd": 17, "HdBoard": 16, "MetalSd": 15, "W
 data.replace(cleanup_nums2, inplace=True)
 data = data.fillna({"Electrical" : 5})
 
+### From the correlation function, drop out the dependent variables which do not affect the model
 corr = data.corr()
 fig,ax=plt.subplots(figsize=(30,30))
 sns.heatmap(corr,ax=ax,annot=True,linewidths=0.05,fmt='.2f',cmap="magma")
@@ -93,6 +96,7 @@ rfr=RandomForestRegressor(n_estimators=100,random_state=42)
 
 X_train,X_test,y_train,y_test=train_test_split(data.values,result.values,test_size=0.20,random_state=42)
 
+### Using Selectpercentile, now we drop more features which are also irrelavant
 select = SelectPercentile(percentile=100)
 select.fit(X_train, y_train)
 X_train_selected = select.transform(X_train)
